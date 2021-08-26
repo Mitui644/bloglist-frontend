@@ -135,6 +135,19 @@ const App = () => {
     }  
   }
 
+  const deleteBlog = async (blog) => {
+    const result = window.confirm(`Remove blog ${blog.title} by ${blog.author}?`);
+    if(result) {
+      try {
+        await blogService.remove(blog.id)
+        setBlogs(blogs.filter(b => b.id !== blog.id))
+        showNotification(`removed blog ${blog.title} by ${blog.author}`, false)
+      } catch(error) {
+        showNotification(`could not remove blog ${blog.title} by ${blog.author}`, true)
+      }
+    }
+  }
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
     <div>
@@ -174,7 +187,7 @@ const App = () => {
           <BlogForm addBlog={addBlog}/>
         </Togglable>
         {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} addLike={addLike} />
+          <Blog key={blog.id} blog={blog} addLike={addLike} deleteBlog={deleteBlog} showDeleteButton={blog.user.username === user.username} />
         )}
         </>
       )   
