@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useImperativeHandle, useRef } from 'react'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -50,10 +51,6 @@ const App = () => {
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   const [notification, setNotification] = useState({message: null, isError: false})
 
@@ -108,25 +105,14 @@ const App = () => {
     showNotification(`user ${loggedOutUserName} logged out`, false) 
   }
 
-  const addBlog = (event) => {
-    event.preventDefault()
+  const addBlog = (blog) => {
     blogFormToggleRef.current.toggleVisibility()
-
-    const blog = {
-      title: title,
-      author: author,
-      url: url,
-    }
 
     blogService
       .create(blog)
         .then(returnedBlog => {
           setBlogs(blogs.concat(returnedBlog))
-          setTitle('')
-          setAuthor('')
-          setUrl('')
           showNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, false)
-
       })
   }
 
@@ -154,39 +140,6 @@ const App = () => {
     </form>
   )
 
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-    <div>
-      title:
-        <input
-        type="text"
-        value={title}
-        name="title"
-        onChange={({ target }) => setTitle(target.value)}
-      />
-    </div>
-    <div>
-      author:
-        <input
-        type="text"
-        value={author}
-        name="author"
-        onChange={({ target }) => setAuthor(target.value)}
-      />
-    </div>
-    <div>
-      url:
-        <input
-        type="text"
-        value={url}
-        name="url"
-        onChange={({ target }) => setUrl(target.value)}
-      />
-    </div>
-      <button type="submit">create</button>
-    </form>  
-  )
-
   return (
     <div>
       <h2>blogs</h2>
@@ -199,7 +152,7 @@ const App = () => {
         <p>{user.username} logged in<button onClick={logOut}>logout</button></p>
         <h2>create new</h2>
         <Togglable buttonLabel='create new blog' ref={blogFormToggleRef}>
-          {blogForm()}
+          <BlogForm addBlog={addBlog}/>
         </Togglable>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
