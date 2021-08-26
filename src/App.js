@@ -3,6 +3,21 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+const Notification = ({notification}) => {
+  if (notification.message === null) {
+    return null
+  }
+  let className = 'note'
+  if(notification.isError) {
+    className += ' error'
+  }
+  return (
+    <div className={className}>
+    {notification.message}
+  </div>
+  )
+}
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
@@ -12,6 +27,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
+  const [notification, setNotification] = useState({message: null, isError: false})
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -28,6 +45,13 @@ const App = () => {
     }
   }, [])
 
+  const showNotification = (message, isError) => {
+    setNotification({message, isError})
+    setTimeout(() => {
+      setNotification({message: null, isError: false})
+    }, 5000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
     console.log('logging in with', username, password)
@@ -40,15 +64,19 @@ const App = () => {
       setPassword('')
       blogService.setToken(user.token)
       window.localStorage.setItem('userInfo', JSON.stringify(user))
+      showNotification(`User ${user.username} logged in`, false) 
     } catch (exception) {
       console.log('Invalid credentials')
+      showNotification('wrong username or password', true) 
     }
   }
 
   const logOut = () => {
+    const loggedOutUserName = user.username
     setUser(null)
     window.localStorage.clear()
     blogService.setToken(null)
+    showNotification(`user ${loggedOutUserName} logged out`, false) 
   }
 
   const addBlog = (event) => {
@@ -66,6 +94,7 @@ const App = () => {
           setTitle('')
           setAuthor('')
           setUrl('')
+          showNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, false) 
       })
   }
 
@@ -129,7 +158,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-
+      <Notification notification={notification} />
       {
       user
       ?
