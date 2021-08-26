@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({blog, addLike, deleteBlog, showDeleteButton}) => {
+const Blog = ({ blog, addLike, deleteBlog, showDeleteButton }) => {
   const [showDetails, setShowDetails] = useState(false)
 
   const blogStyle = {
@@ -29,15 +29,15 @@ const Blog = ({blog, addLike, deleteBlog, showDeleteButton}) => {
       <div>{blog.title} <button onClick={toggleDetails}>{showDetails ? 'hide' : 'view'}</button></div>
       {showDetails && (
         <>
-        <div>{blog.url}</div>
-        <div>{blog.likes}<button onClick={pressLike}>like</button></div>
-        <div>{blog.author}</div>
-        {showDeleteButton && <button onClick={pressRemove}>remove</button>}
+          <div>{blog.url}</div>
+          <div>{blog.likes}<button onClick={pressLike}>like</button></div>
+          <div>{blog.author}</div>
+          {showDeleteButton && <button onClick={pressRemove}>remove</button>}
         </>
       )
       }
     </div>
-  )  
+  )
 }
 
 Blog.propTypes = {

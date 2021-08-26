@@ -33,6 +33,6 @@ const remove = (id) => {
   return axios.delete(baseUrl + '/' + id, config)
 }
 
-const blog_exports = {setToken, getAll, create, update, remove}
+const blog_exports = { setToken, getAll, create, update, remove }
 
 export default blog_exports
