@@ -116,6 +116,25 @@ const App = () => {
       })
   }
 
+  const addLike = async (blog) => {
+    const changedBlog = { 
+      user: blog.user.id,
+      likes: blog.likes + 1,
+      author: blog.author,
+      title: blog.title,
+      url: blog.url
+    }
+  
+    try {
+      const returnedBlog = await blogService.update(blog.id, changedBlog)
+      setBlogs(blogs.map(b => b.id !== blog.id ? b : returnedBlog))
+      showNotification(`a like added to blog ${returnedBlog.title} by ${returnedBlog.author}`, false)
+
+    } catch(error) {
+      showNotification(`not able to add a like to blog ${blog.title} by ${blog.author}`, true)
+    }  
+  }
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
     <div>
@@ -155,7 +174,7 @@ const App = () => {
           <BlogForm addBlog={addBlog}/>
         </Togglable>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} addLike={addLike} />
         )}
         </>
       )   
