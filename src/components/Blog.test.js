@@ -19,10 +19,11 @@ describe('<Blog />', () => {
     }
   }
 
+  const likeFunction = jest.fn()
 
   beforeEach(() => {
     component = render(
-      <Blog blog={blog} addLike={jest.fn()} deleteBlog={jest.fn()} showDeleteButton={false}/>
+      <Blog blog={blog} addLike={likeFunction} deleteBlog={jest.fn()} showDeleteButton={false}/>
     )
   })
 
@@ -44,6 +45,17 @@ describe('<Blog />', () => {
 
     expect(component.container).toHaveTextContent('test_url')
     expect(component.container).toHaveTextContent('likes ' + blog.likes)
+  })
+
+  test('clicking the like button twice calls event handler twice', () => {
+
+    const viewButton = component.getByText('view')
+    fireEvent.click(viewButton)
+    const likeButton = component.getByText('like')
+    fireEvent.click(likeButton)
+    fireEvent.click(likeButton)
+
+    expect(likeFunction.mock.calls).toHaveLength(2)
   })
 
 })
