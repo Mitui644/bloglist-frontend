@@ -1,7 +1,34 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useImperativeHandle, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+
+const Togglable = React.forwardRef((props, ref) => {
+  const [visible, setVisible] = useState(false)
+
+  const hideWhenVisible = { display: visible ? 'none' : '' }
+  const showWhenVisible = { display: visible ? '' : 'none' }
+
+  const toggleVisibility = () => {
+    setVisible(!visible)
+  }
+
+  useImperativeHandle(ref, () => {
+    return { toggleVisibility }
+  })
+
+  return (
+    <div>
+      <div style={hideWhenVisible}>
+        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+      </div>
+      <div style={showWhenVisible}>
+        {props.children}
+        <button onClick={toggleVisibility}>cancel</button>
+      </div>
+    </div>
+  )
+})
 
 const Notification = ({notification}) => {
   if (notification.message === null) {
@@ -29,6 +56,8 @@ const App = () => {
   const [url, setUrl] = useState('')
 
   const [notification, setNotification] = useState({message: null, isError: false})
+
+  const blogFormToggleRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -81,6 +110,8 @@ const App = () => {
 
   const addBlog = (event) => {
     event.preventDefault()
+    blogFormToggleRef.current.toggleVisibility()
+
     const blog = {
       title: title,
       author: author,
@@ -94,7 +125,8 @@ const App = () => {
           setTitle('')
           setAuthor('')
           setUrl('')
-          showNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, false) 
+          showNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`, false)
+
       })
   }
 
@@ -166,7 +198,9 @@ const App = () => {
         <>
         <p>{user.username} logged in<button onClick={logOut}>logout</button></p>
         <h2>create new</h2>
-        {blogForm()}
+        <Togglable buttonLabel='create new blog' ref={blogFormToggleRef}>
+          {blogForm()}
+        </Togglable>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
