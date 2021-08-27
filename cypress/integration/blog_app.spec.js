@@ -87,5 +87,42 @@ describe('Blog app', function() {
         cy.get('html').should('not.contain', 'another blog cypres')
       })
     })
+    describe('and several blogs exists with likes', function () {
+      beforeEach(function () {
+
+        const blogCount = 10
+
+        for(let i = 0; i < blogCount; ++i) {
+          cy.createBlog({
+            title: `blog number ${i}`,
+            author: 'some author here',
+            url: 'asd url'
+          })
+        }
+
+        for(let i = 0; i < blogCount; ++i) {
+          // Open details of each blog
+          cy.contains(`blog number ${i}`).find('button').click()
+        }
+
+        for(let i = 0; i < blogCount; ++i) {
+          cy.contains(`blog number ${i}`).parent().as(`blogDiv${i}`)
+          for(let j = 0; j < i; ++j) {
+            cy.get(`@blogDiv${i}`).find('button').contains('like').click()
+            cy.wait(100)
+          }
+        }
+      })
+
+      it('blogs are sorted by likes', function () {
+        let blogCount = 10
+        cy.get('.likeField').then((likes) => {
+
+          for(let i = 0; i < blogCount; ++i) {
+            cy.wrap(likes).eq(i).contains(`likes ${blogCount - (i + 1)}`)
+          }
+        })
+      })
+    })
   })
 })
