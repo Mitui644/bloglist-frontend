@@ -76,6 +76,16 @@ describe('Blog app', function() {
         cy.get('button').contains('like').click()
         cy.get('@blogDiv').contains('likes 1')
       })
+
+      it('user can delete the blog', function () {
+        cy.contains('like this blog').find('button').click()
+        cy.contains('like this blog').parent().as('blogDiv')
+        cy.get('button').contains('remove').click()
+
+        cy.wait(7000) // Wait for notification bar to disappear
+        cy.get('html').should('not.contain', 'like this blog')
+        cy.get('html').should('not.contain', 'another blog cypres')
+      })
     })
   })
 })
