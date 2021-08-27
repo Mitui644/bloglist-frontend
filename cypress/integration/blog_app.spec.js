@@ -59,5 +59,23 @@ describe('Blog app', function() {
       cy.wait(7000) // Wait for notification bar to disappear
       cy.contains('example blog title').contains('example blog author').contains('view')
     })
+
+    describe('and a blog exists', function () {
+      beforeEach(function () {
+        cy.createBlog({
+          title: 'like this blog',
+          author: 'another blog cypress',
+          url: 'asd url'
+        })
+      })
+
+      it('user can like the blog', function () {
+        cy.contains('like this blog').find('button').click()
+        cy.contains('like this blog').parent().as('blogDiv')
+        cy.get('@blogDiv').contains('likes 0')
+        cy.get('button').contains('like').click()
+        cy.get('@blogDiv').contains('likes 1')
+      })
+    })
   })
 })
